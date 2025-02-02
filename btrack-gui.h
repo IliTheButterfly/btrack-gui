@@ -1,7 +1,7 @@
-#ifndef __BTRACK-GUI_H__
-#define __BTRACK-GUI_H__
+#ifndef __BTRACK_GUI_H__
+#define __BTRACK_GUI_H__
 
 
 
 
-#endif // __BTRACK-GUI_H__
+#endif // __BTRACK_GUI_H__

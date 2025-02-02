@@ -12,10 +12,10 @@ project("btrack-gui")
 #  set_property(TARGET btrack-core PROPERTY CXX_STANDARD 20)
 #endif()
 
-set(FETCH_NODE_EDITOR OFF CACHE BOOL "Use ExternalProject to fetch nodeeditor?")
+set(FETCH_NODE_EDITOR ON CACHE BOOL "Use ExternalProject to fetch nodeeditor?")
 set(NODEEDITOR_DIR "" CACHE PATH "Path to the nodeeditor library if FETCH_NODE_EDITOR is OFF.")
 
-include_directories(${btrack_core_INCLUDES})
+# include_directories(${btrack_core_INCLUDES})
 file(GLOB_RECURSE BTRACK_GUI_SOURCES "**.cpp")
 list(FILTER BTRACK_GUI_SOURCES EXCLUDE REGEX "tests/.*")
 list(FILTER BTRACK_GUI_SOURCES EXCLUDE REGEX "examples/.*")
@@ -26,7 +26,6 @@ find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui OpenGL)
 
 # Import qt nodes
 if (FETCH_NODE_EDITOR)
-	include(ExternalProject)
 	FetchContent_Declare(
 		QtNodes
 		URL https://github.com/IliTheButterfly/nodeeditor/archive/refs/tags/3.0.11.zip
