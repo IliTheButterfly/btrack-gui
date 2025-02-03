@@ -11,6 +11,7 @@ project("btrack-gui")
 #if (CMAKE_VERSION VERSION_GREATER 3.12)
 #  set_property(TARGET btrack-core PROPERTY CXX_STANDARD 20)
 #endif()
+set(CMAKE_AUTOMOC ON)
 
 set(FETCH_NODE_EDITOR ON CACHE BOOL "Use ExternalProject to fetch nodeeditor?")
 set(NODEEDITOR_DIR "" CACHE PATH "Path to the nodeeditor library if FETCH_NODE_EDITOR is OFF.")
@@ -41,7 +42,7 @@ else()
 	# target_link_libraries(btrack-gui "${NODEEDITOR_DIR}/build/lib/libQtNodes.so")
 endif()
 
-include_directories(binding)
+include_directories("binding")
 
 target_link_libraries(btrack-gui
     Qt${QT_VERSION_MAJOR}::Core

@@ -1,81 +1,60 @@
-/********************************************************************************
-** Form generated from reading UI file 'designergVMYEb.ui'
-**
-** Created by: Qt User Interface Compiler version 5.15.3
-**
-** WARNING! All changes made in this file will be lost when recompiling UI file!
-********************************************************************************/
+#include <QtNodes/BasicGraphicsScene>
+#include <QtNodes/ConnectionStyle>
+#include <QtNodes/GraphicsView>
+#include <QtNodes/StyleCollection>
+#include <QtNodes/NodeDelegateModelRegistry>
 
-#ifndef DESIGNERGVMYEB_H
-#define DESIGNERGVMYEB_H
-
-#include <QtCore/QVariant>
+#include <QAction>
+#include <QScreen>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QMainWindow>
-#include <QtWidgets/QMenuBar>
-#include <QtWidgets/QStatusBar>
-#include <QtWidgets/QWidget>
 
-QT_BEGIN_NAMESPACE
+#include "binding.h"
 
-class Ui_MainWindow
-{
-public:
-    QWidget *centralwidget;
-    QMenuBar *menubar;
-    QStatusBar *statusbar;
+using QtNodes::BasicGraphicsScene;
+using QtNodes::ConnectionStyle;
+using QtNodes::GraphicsView;
+using QtNodes::NodeRole;
+using QtNodes::StyleCollection;
 
-    void setupUi(QMainWindow *MainWindow)
-    {
-        if (MainWindow->objectName().isEmpty())
-            MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(800, 600);
-        centralwidget = new QWidget(MainWindow);
-        centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
-        MainWindow->setCentralWidget(centralwidget);
-        menubar = new QMenuBar(MainWindow);
-        menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 800, 22));
-        MainWindow->setMenuBar(menubar);
-        statusbar = new QStatusBar(MainWindow);
-        statusbar->setObjectName(QString::fromUtf8("statusbar"));
-        MainWindow->setStatusBar(statusbar);
-
-        retranslateUi(MainWindow);
-
-        QMetaObject::connectSlotsByName(MainWindow);
-    } // setupUi
-
-    void retranslateUi(QMainWindow *MainWindow)
-    {
-        MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
-    } // retranslateUi
-};
-
-namespace Ui
-{
-    class MainWindow : public Ui_MainWindow
-    {
-    };
-} // namespace Ui
-
-QT_END_NAMESPACE
-
-#include <QApplication>
-#include <QtWidgets/QPushButton>
-#include <QThread>
-#include <QtNodes/NodeDelegateModel>
-
-
-
-int main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    QMainWindow window;
-    Ui::MainWindow mainWindow;
-    mainWindow.setupUi(&window);
-    window.show();
+
+    NodeGraphModel graphModel;
+
+    // Initialize and connect two nodes.
+    {
+        NodeId id1 = graphModel.addNode();
+        graphModel.setNodeData(id1, NodeRole::Position, QPointF(0, 0));
+
+        NodeId id2 = graphModel.addNode();
+        graphModel.setNodeData(id2, NodeRole::Position, QPointF(300, 300));
+
+        graphModel.addConnection(ConnectionId{id1, 0, id2, 0});
+    }
+
+    auto scene = new BasicGraphicsScene(graphModel);
+
+    GraphicsView view(scene);
+
+    // Setup context menu for creating new nodes.
+    view.setContextMenuPolicy(Qt::ActionsContextMenu);
+    QAction createNodeAction(QStringLiteral("Create Node"), &view);
+    QObject::connect(&createNodeAction, &QAction::triggered, [&]() {
+        // Mouse position in scene coordinates.
+        QPointF posView = view.mapToScene(view.mapFromGlobal(QCursor::pos()));
+
+        NodeId const newId = graphModel.addNode();
+        graphModel.setNodeData(newId, NodeRole::Position, posView);
+    });
+    view.insertAction(view.actions().front(), &createNodeAction);
+
+    view.setWindowTitle("Simple Node Graph");
+    view.resize(800, 600);
+
+    // Center window.
+    view.move(QApplication::primaryScreen()->availableGeometry().center() - view.rect().center());
+    view.showNormal();
+
     return app.exec();
 }
-
-#endif // DESIGNERGVMYEB_H

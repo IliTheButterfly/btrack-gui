@@ -55,7 +55,7 @@ NodeId NodeGraphModel::addNode(QString const nodeType)
     NodeId newId = newNodeId();
     // Create new node.
     _nodeIds.insert(newId);
-	auto node = std::make_shared<btrack::nodes::utilities::math::Negate<int>>("Negate", "Negate");
+	auto node = std::make_shared<btrack::nodes::utilities::math::MetaNegate<int>>("Negate", "Negate");
 	_nodes.emplace(std::make_pair(newId, std::reinterpret_pointer_cast<MetaNode>(node)));
 
     Q_EMIT nodeCreated(newId);
@@ -65,6 +65,7 @@ NodeId NodeGraphModel::addNode(QString const nodeType)
 
 bool NodeGraphModel::connectionPossible(ConnectionId const connectionId) const
 {
+	return true;
 	auto inNode = _nodes.at(connectionId.inNodeId)->_MetaInputAt(connectionId.inPortIndex);
 	auto outNode = _nodes.at(connectionId.outNodeId)->_MetaOutputAt(connectionId.outPortIndex);
     return outNode->canConnectTo(inNode) && _connectivity.find(connectionId) == _connectivity.end();
@@ -190,8 +191,9 @@ QVariant NodeGraphModel::portData(NodeId nodeId,
 {
 	auto node = _nodes.at(nodeId);
 	std::shared_ptr<btrack::nodes::system::MetaNodeIO> io;
-	if (portIndex < node->inputCount()) io = std::reinterpret_pointer_cast<btrack::nodes::system::MetaNodeIO>(node->_MetaInputAt(portIndex));
-	else io = std::reinterpret_pointer_cast<btrack::nodes::system::MetaNodeIO>(node->_MetaOutputAt(portIndex - node->inputCount()));
+	if (portType == PortType::In) io = std::reinterpret_pointer_cast<btrack::nodes::system::MetaNodeIO>(node->_MetaInputAt(portIndex));
+	else if (portType == PortType::Out) io = std::reinterpret_pointer_cast<btrack::nodes::system::MetaNodeIO>(node->_MetaOutputAt(portIndex));
+	else return QVariant();
     switch (role) {
     case PortRole::Data:
         return QVariant();
@@ -221,12 +223,11 @@ QVariant NodeGraphModel::portData(NodeId nodeId,
 bool NodeGraphModel::setPortData(
     NodeId nodeId, PortType portType, PortIndex portIndex, QVariant const &value, PortRole role)
 {
-    Q_UNUSED(portType);
-
 	auto node = _nodes.at(nodeId);
 	std::shared_ptr<btrack::nodes::system::MetaNodeIO> io;
-	if (portIndex < node->inputCount()) io = std::reinterpret_pointer_cast<btrack::nodes::system::MetaNodeIO>(node->_MetaInputAt(portIndex));
-	else io = std::reinterpret_pointer_cast<btrack::nodes::system::MetaNodeIO>(node->_MetaOutputAt(portIndex - node->inputCount()));
+	if (portType == PortType::In) io = std::reinterpret_pointer_cast<btrack::nodes::system::MetaNodeIO>(node->_MetaInputAt(portIndex));
+	else if (portType == PortType::Out) io = std::reinterpret_pointer_cast<btrack::nodes::system::MetaNodeIO>(node->_MetaOutputAt(portIndex));
+	else return false;
     switch (role) {
     case PortRole::Data:
         return false;
