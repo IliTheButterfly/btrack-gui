@@ -41,6 +41,7 @@ else()
 	# target_link_libraries(btrack-gui "${NODEEDITOR_DIR}/build/lib/libQtNodes.so")
 endif()
 
+include_directories(binding)
 
 target_link_libraries(btrack-gui
     Qt${QT_VERSION_MAJOR}::Core
