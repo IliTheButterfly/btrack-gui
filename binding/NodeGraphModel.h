@@ -24,12 +24,13 @@ using StyleCollection = QtNodes::StyleCollection;
 using QtNodes::InvalidNodeId;
 
 using MetaNode = btrack::nodes::system::MetaNode;
+using NodeObserver = btrack::nodes::system::NodeObserver;
 
 /**
  * The class implements a bare minimum required to demonstrate a model-based
  * graph.
  */
-class NodeGraphModel : public QtNodes::AbstractGraphModel
+class NodeGraphModel : public QtNodes::AbstractGraphModel, public NodeObserver, public std::enable_shared_from_this<NodeGraphModel>
 {
     Q_OBJECT
 public:
@@ -95,6 +96,8 @@ public:
     void loadNode(QJsonObject const &nodeJson) override;
 
     NodeId newNodeId() override { return _nextNodeId++; }
+
+    void update() override {}
 
 private:
     std::unordered_set<NodeId> _nodeIds;

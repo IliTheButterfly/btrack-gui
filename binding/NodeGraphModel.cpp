@@ -55,8 +55,8 @@ NodeId NodeGraphModel::addNode(QString const nodeType)
     NodeId newId = newNodeId();
     // Create new node.
     _nodeIds.insert(newId);
-	auto node = std::make_shared<btrack::nodes::utilities::math::MetaNegate<int>>("Negate", "Negate");
-	_nodes.emplace(std::make_pair(newId, std::reinterpret_pointer_cast<MetaNode>(node)));
+	auto node = btrack::nodes::utilities::math::MetaNegate<int>::create(std::dynamic_pointer_cast<NodeObserver>(this->shared_from_this()), "Negate", "Negate");
+	_nodes.emplace(std::make_pair(newId, std::dynamic_pointer_cast<MetaNode>(node)));
 
     Q_EMIT nodeCreated(newId);
 
