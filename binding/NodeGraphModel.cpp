@@ -55,8 +55,8 @@ NodeId NodeGraphModel::addNode(QString const nodeType)
     NodeId newId = newNodeId();
     // Create new node.
     _nodeIds.insert(newId);
-	auto node = btrack::nodes::utilities::math::MetaNegate<int>::create(std::dynamic_pointer_cast<NodeObserver>(this->shared_from_this()), "Negate", "Negate");
-	_nodes.emplace(std::make_pair(newId, std::dynamic_pointer_cast<MetaNode>(node)));
+	// auto node = btrack::nodes::utilities::math::MetaNegate<int>::create(std::dynamic_pointer_cast<NodeObserver>(this->shared_from_this()), "Negate", "Negate");
+	// _nodes.emplace(std::make_pair(newId, std::dynamic_pointer_cast<MetaNode>(node)));
 
     Q_EMIT nodeCreated(newId);
 
@@ -66,16 +66,16 @@ NodeId NodeGraphModel::addNode(QString const nodeType)
 bool NodeGraphModel::connectionPossible(ConnectionId const connectionId) const
 {
 	return true;
-	auto inNode = _nodes.at(connectionId.inNodeId)->_MetaInputAt(connectionId.inPortIndex);
-	auto outNode = _nodes.at(connectionId.outNodeId)->_MetaOutputAt(connectionId.outPortIndex);
-    return outNode->canConnectTo(inNode) && _connectivity.find(connectionId) == _connectivity.end();
+	// auto inNode = _nodes.at(connectionId.inNodeId)->_MetaInputAt(connectionId.inPortIndex);
+	// auto outNode = _nodes.at(connectionId.outNodeId)->_MetaOutputAt(connectionId.outPortIndex);
+    // return outNode->canConnectTo(inNode) && _connectivity.find(connectionId) == _connectivity.end();
 }
 
 void NodeGraphModel::addConnection(ConnectionId const connectionId)
 {
-	auto inNode = _nodes.at(connectionId.inNodeId)->_MetaInputAt(connectionId.inPortIndex);
-	auto outNode = _nodes.at(connectionId.outNodeId)->_MetaOutputAt(connectionId.outPortIndex);
-	if (!outNode->connectTo(inNode)) return;
+	// auto inNode = _nodes.at(connectionId.inNodeId)->_MetaInputAt(connectionId.inPortIndex);
+	// auto outNode = _nodes.at(connectionId.outNodeId)->_MetaOutputAt(connectionId.outPortIndex);
+	// if (!outNode->connectTo(inNode)) return;
 
     _connectivity.insert(connectionId);
 
@@ -96,7 +96,7 @@ QVariant NodeGraphModel::nodeData(NodeId nodeId, NodeRole role) const
 
     switch (role) {
     case NodeRole::Type:
-        result = QString(_nodes.at(nodeId)->friendlyName().c_str());
+        // result = QString(_nodes.at(nodeId)->friendlyName().c_str());
         break;
 
     case NodeRole::Position:
@@ -112,7 +112,7 @@ QVariant NodeGraphModel::nodeData(NodeId nodeId, NodeRole role) const
         break;
 
     case NodeRole::Caption:
-        result = QString(_nodes.at(nodeId)->friendlyName().c_str());
+        // result = QString(_nodes.at(nodeId)->friendlyName().c_str());
         break;
 
     case NodeRole::Style: {
@@ -124,11 +124,11 @@ QVariant NodeGraphModel::nodeData(NodeId nodeId, NodeRole role) const
         break;
 
     case NodeRole::InPortCount:
-        result = (unsigned int)_nodes.at(nodeId)->inputCount();
+        // result = (unsigned int)_nodes.at(nodeId)->inputCount();
         break;
 
     case NodeRole::OutPortCount:
-        result = (unsigned int)_nodes.at(nodeId)->outputCount();
+        // result = (unsigned int)_nodes.at(nodeId)->outputCount();
         break;
 
     case NodeRole::Widget:
@@ -189,23 +189,23 @@ QVariant NodeGraphModel::portData(NodeId nodeId,
                                     PortIndex portIndex,
                                     PortRole role) const
 {
-	auto node = _nodes.at(nodeId);
-	std::shared_ptr<btrack::nodes::system::MetaNodeIO> io;
-	if (portType == PortType::In) io = std::reinterpret_pointer_cast<btrack::nodes::system::MetaNodeIO>(node->_MetaInputAt(portIndex));
-	else if (portType == PortType::Out) io = std::reinterpret_pointer_cast<btrack::nodes::system::MetaNodeIO>(node->_MetaOutputAt(portIndex));
-	else return QVariant();
+	// auto node = _nodes.at(nodeId);
+	// std::shared_ptr<btrack::nodes::system::MetaNodeIO> io;
+	// if (portType == PortType::In) io = std::reinterpret_pointer_cast<btrack::nodes::system::MetaNodeIO>(node->_MetaInputAt(portIndex));
+	// else if (portType == PortType::Out) io = std::reinterpret_pointer_cast<btrack::nodes::system::MetaNodeIO>(node->_MetaOutputAt(portIndex));
+	// else return QVariant();
     switch (role) {
     case PortRole::Data:
         return QVariant();
         break;
 
     case PortRole::DataType:
-        return io->dataType().name();
+        // return io->dataType().name();
         break;
 
     case PortRole::ConnectionPolicyRole:
-		if (io->isInput()) return QVariant::fromValue(ConnectionPolicy::One);
-		else return QVariant::fromValue(ConnectionPolicy::Many);
+		// if (io->isInput()) return QVariant::fromValue(ConnectionPolicy::One);
+		// else return QVariant::fromValue(ConnectionPolicy::Many);
         break;
 
     case PortRole::CaptionVisible:
@@ -213,7 +213,7 @@ QVariant NodeGraphModel::portData(NodeId nodeId,
         break;
 
     case PortRole::Caption:
-        return QString(io->friendlyName().c_str());
+        // return QString(io->friendlyName().c_str());
         break;
     }
 
@@ -223,11 +223,11 @@ QVariant NodeGraphModel::portData(NodeId nodeId,
 bool NodeGraphModel::setPortData(
     NodeId nodeId, PortType portType, PortIndex portIndex, QVariant const &value, PortRole role)
 {
-	auto node = _nodes.at(nodeId);
-	std::shared_ptr<btrack::nodes::system::MetaNodeIO> io;
-	if (portType == PortType::In) io = std::reinterpret_pointer_cast<btrack::nodes::system::MetaNodeIO>(node->_MetaInputAt(portIndex));
-	else if (portType == PortType::Out) io = std::reinterpret_pointer_cast<btrack::nodes::system::MetaNodeIO>(node->_MetaOutputAt(portIndex));
-	else return false;
+	// auto node = _nodes.at(nodeId);
+	// std::shared_ptr<btrack::nodes::system::MetaNodeIO> io;
+	// if (portType == PortType::In) io = std::reinterpret_pointer_cast<btrack::nodes::system::MetaNodeIO>(node->_MetaInputAt(portIndex));
+	// else if (portType == PortType::Out) io = std::reinterpret_pointer_cast<btrack::nodes::system::MetaNodeIO>(node->_MetaOutputAt(portIndex));
+	// else return false;
     switch (role) {
     case PortRole::Data:
         return false;
@@ -246,7 +246,7 @@ bool NodeGraphModel::setPortData(
         break;
 
     case PortRole::Caption:
-        io->friendlyName() = value.toString().toStdString();
+        // io->friendlyName() = value.toString().toStdString();
         break;
     }
 
@@ -257,16 +257,16 @@ bool NodeGraphModel::deleteConnection(ConnectionId const connectionId)
 {
     bool disconnected = false;
 
-    auto it = _connectivity.find(connectionId);
-	auto inNode = _nodes.at(connectionId.inNodeId)->_MetaInputAt(connectionId.inPortIndex);
-	auto outNode = _nodes.at(connectionId.outNodeId)->_MetaOutputAt(connectionId.outPortIndex);
+    // auto it = _connectivity.find(connectionId);
+	// auto inNode = _nodes.at(connectionId.inNodeId)->_MetaInputAt(connectionId.inPortIndex);
+	// auto outNode = _nodes.at(connectionId.outNodeId)->_MetaOutputAt(connectionId.outPortIndex);
 
-    if (it != _connectivity.end()) {
-        disconnected = true;
+    // if (it != _connectivity.end()) {
+    //     disconnected = true;
 
-        _connectivity.erase(it);
-		outNode->disconnectFrom(inNode);
-    }
+    //     _connectivity.erase(it);
+	// 	outNode->disconnectFrom(inNode);
+    // }
 
     if (disconnected)
         Q_EMIT connectionDeleted(connectionId);
@@ -283,8 +283,8 @@ bool NodeGraphModel::deleteNode(NodeId const nodeId)
         deleteConnection(cId);
     }
 
-    _nodeIds.erase(nodeId);
-	_nodes.erase(nodeId);
+    // _nodeIds.erase(nodeId);
+	// _nodes.erase(nodeId);
     _nodeGeometryData.erase(nodeId);
 
     Q_EMIT nodeDeleted(nodeId);

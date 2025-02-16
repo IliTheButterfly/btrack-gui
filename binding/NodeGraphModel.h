@@ -23,14 +23,12 @@ using PortType = QtNodes::PortType;
 using StyleCollection = QtNodes::StyleCollection;
 using QtNodes::InvalidNodeId;
 
-using MetaNode = btrack::nodes::system::MetaNode;
-using NodeObserver = btrack::nodes::system::NodeObserver;
 
 /**
  * The class implements a bare minimum required to demonstrate a model-based
  * graph.
  */
-class NodeGraphModel : public QtNodes::AbstractGraphModel, public NodeObserver, public std::enable_shared_from_this<NodeGraphModel>
+class NodeGraphModel : public QtNodes::AbstractGraphModel
 {
     Q_OBJECT
 public:
@@ -97,11 +95,11 @@ public:
 
     NodeId newNodeId() override { return _nextNodeId++; }
 
-    void update() override {}
+    void update() {}
 
 private:
     std::unordered_set<NodeId> _nodeIds;
-    boost::unordered_map<NodeId, std::shared_ptr<MetaNode>> _nodes;
+    boost::unordered_map<NodeId, btrack::nodes::system::ID_t> _nodes;
 
     /// [Important] This is a user defined data structure backing your model.
     /// In your case it could be anything else representing a graph, for example, a

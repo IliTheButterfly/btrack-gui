@@ -2,20 +2,20 @@
 #define __NODEGRAPH_H__
 
 
-#include "nodes/system/MetaNode.h"
-
+#include "btrack-core.h"
 
 namespace btrack::gui::binding {
 
 using namespace nodes::system;
 
+template <VariantTemplate VariantType>
 class NodeRegistry
 {
 public:
-	using MetaNodeType = MetaNode;
-	using MetaNodePtr = std::shared_ptr<MetaNode>;
+	using NodeType = Node<VariantType>;
+	using NodePtr = Node<VariantType>*;
 
-	using RegistryItemPtr = std::unique_ptr<MetaNode>;
+	using RegistryItemPtr = unique_ptr<NodeType>;
     using RegistryItemCreator = std::function<RegistryItemPtr()>;
     using RegisteredModelCreatorsMap = std::unordered_map<std::string, RegistryItemCreator>;
     using RegisteredModelsCategoryMap = std::unordered_map<std::string, std::string>;
@@ -49,7 +49,7 @@ public:
         registerNode<NodeType>(std::move(creator), category);
     }
 
-	std::unique_ptr<MetaNode> create(std::string const &modelName);
+	unique_ptr<NodeType> create(std::string const &modelName);
 
     RegisteredModelCreatorsMap const &registeredModelCreators() const;
 
@@ -97,15 +97,15 @@ private:
     {
         // Assert always fires, but the compiler doesn't know this:
         static_assert(!std::is_same<T, T>::value,
-                      "The ModelCreator must return a std::unique_ptr<T>, where T "
+                      "The ModelCreator must return a unique_ptr<T>, where T "
                       "inherits from MetaNode");
     };
 
     template<typename T>
-    struct UnwrapUniquePtr<std::unique_ptr<T>>
+    struct UnwrapUniquePtr<unique_ptr<T>>
     {
-        static_assert(std::is_base_of<MetaNode, T>::value,
-                      "The ModelCreator must return a std::unique_ptr<T>, where T "
+        static_assert(std::is_base_of<NodeType, T>::value,
+                      "The ModelCreator must return a unique_ptr<T>, where T "
                       "inherits from MetaNode");
         using type = T;
     };
@@ -113,6 +113,38 @@ private:
     template<typename CreatorResult>
     using compute_model_type_t = typename UnwrapUniquePtr<CreatorResult>::type;
 };
+
+template <VariantTemplate VariantType>
+inline unique_ptr<typename NodeRegistry<VariantType>::NodeType> NodeRegistry<VariantType>::create(std::string const &modelName)
+{
+    auto it = _registeredItemCreators.find(modelName);
+
+    if (it != _registeredItemCreators.end()) {
+        return it->second();
+    }
+
+    return nullptr;
+}
+
+template <VariantTemplate VariantType>
+inline NodeRegistry<VariantType>::RegisteredModelCreatorsMap const &
+NodeRegistry<VariantType>::registeredModelCreators() const
+{
+    return _registeredItemCreators;
+}
+
+template <VariantTemplate VariantType>
+inline NodeRegistry<VariantType>::RegisteredModelsCategoryMap const &
+NodeRegistry<VariantType>::registeredModelsCategoryAssociation() const
+{
+    return _registeredModelsCategory;
+}
+
+template <VariantTemplate VariantType>
+inline NodeRegistry<VariantType>::CategoriesSet const &NodeRegistry<VariantType>::categories() const
+{
+    return _categories;
+}
 
 
 } // namespace btrack::nodes::system
